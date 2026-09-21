@@ -43,3 +43,4 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
