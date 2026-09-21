@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'org.springframework.boot:spring-boot-h2console'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-restclient'
@@ -43,4 +44,42 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+tasks.register('dev') {
+    group = 'application'
+    description = 'Continuously compiles and runs the application with DevTools restart support'
+
+    doLast {
+        def wrapper = System.getProperty('os.name').toLowerCase().contains('windows')
+                ? 'gradlew.bat'
+                : './gradlew'
+        def compiler = new ProcessBuilder(wrapper, 'classes', '--continuous', '--no-daemon')
+                .directory(project.rootDir)
+                .start()
+        def application = new ProcessBuilder(wrapper, 'bootRun', '--no-daemon')
+                .directory(project.rootDir)
+                .start()
+        def outputThreads = [
+                Thread.start { compiler.inputStream.transferTo(System.out) },
+                Thread.start { compiler.errorStream.transferTo(System.err) },
+                Thread.start { application.inputStream.transferTo(System.out) },
+                Thread.start { application.errorStream.transferTo(System.err) }
+        ]
+
+        def stopProcesses = {
+            [application, compiler].each { process ->
+                if (process.isAlive()) {
+                    process.destroy()
+                }
+            }
+        }
+
+        Runtime.runtime.addShutdownHook(new Thread(stopProcesses))
+        try {
+            application.waitFor()
+        } finally {
+            stopProcesses()
+            outputThreads*.join(5000)
+        }
+    }
+}
