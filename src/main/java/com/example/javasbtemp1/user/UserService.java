@@ -51,7 +51,7 @@ public class UserService {
 			}
 			user.setEmail(email);
 		}
-		if (request.getAddress() != null) {
+		if (request.isAddressProvided()) {
 			user.setAddress(trimToNull(request.getAddress()));
 		}
 

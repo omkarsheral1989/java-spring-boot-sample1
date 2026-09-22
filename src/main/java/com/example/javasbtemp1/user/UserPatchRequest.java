@@ -14,4 +14,14 @@ public class UserPatchRequest {
     private String email;
 
     private String address;
+    private boolean addressProvided;
+
+    public void setAddress(String address) {
+        this.addressProvided = true;
+        this.address = address;
+    }
+
+    public boolean isAddressProvided() {
+        return addressProvided;
+    }
 }
