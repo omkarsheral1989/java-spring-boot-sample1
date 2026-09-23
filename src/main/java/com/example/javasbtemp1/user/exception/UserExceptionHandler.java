@@ -1,9 +1,10 @@
-package com.example.javasbtemp1.user;
+package com.example.javasbtemp1.user.exception;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.example.javasbtemp1.user.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +28,7 @@ public class UserExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException exception) {
+        System.out.println("Validation error: " + exception.getBindingResult().getFieldErrors());
         Map<String, String> fieldErrors = new LinkedHashMap<>();
         exception.getBindingResult().getFieldErrors()
                 .forEach(fieldError -> fieldErrors.putIfAbsent(fieldError.getField(), fieldError.getDefaultMessage()));

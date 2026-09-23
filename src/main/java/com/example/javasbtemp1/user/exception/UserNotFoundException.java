@@ -1,4 +1,4 @@
-package com.example.javasbtemp1.user;
+package com.example.javasbtemp1.user.exception;
 
 public class UserNotFoundException extends RuntimeException {
 

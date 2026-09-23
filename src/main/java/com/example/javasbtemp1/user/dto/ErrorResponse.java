@@ -1,4 +1,4 @@
-package com.example.javasbtemp1.user;
+package com.example.javasbtemp1.user.dto;
 
 import java.time.Instant;
 import java.util.Map;

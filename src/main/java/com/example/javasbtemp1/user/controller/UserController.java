@@ -1,8 +1,12 @@
-package com.example.javasbtemp1.user;
+package com.example.javasbtemp1.user.controller;
 
 import java.net.URI;
 import java.util.List;
 
+import com.example.javasbtemp1.user.dto.CreateUserRequest;
+import com.example.javasbtemp1.user.dto.UserPatchRequest;
+import com.example.javasbtemp1.user.entity.User;
+import com.example.javasbtemp1.user.service.UserService;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;

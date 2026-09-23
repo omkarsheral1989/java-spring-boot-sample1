@@ -1,5 +1,11 @@
-package com.example.javasbtemp1.user;
+package com.example.javasbtemp1.user.service;
 
+import com.example.javasbtemp1.user.dto.CreateUserRequest;
+import com.example.javasbtemp1.user.dto.UserPatchRequest;
+import com.example.javasbtemp1.user.entity.User;
+import com.example.javasbtemp1.user.exception.DuplicateEmailException;
+import com.example.javasbtemp1.user.exception.UserNotFoundException;
+import com.example.javasbtemp1.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;

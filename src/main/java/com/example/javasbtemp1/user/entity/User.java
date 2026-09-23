@@ -1,4 +1,4 @@
-package com.example.javasbtemp1.user;
+package com.example.javasbtemp1.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

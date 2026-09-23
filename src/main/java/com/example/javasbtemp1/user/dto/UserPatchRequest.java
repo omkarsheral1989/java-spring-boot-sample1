@@ -1,4 +1,4 @@
-package com.example.javasbtemp1.user;
+package com.example.javasbtemp1.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
@@ -19,9 +19,5 @@ public class UserPatchRequest {
     public void setAddress(String address) {
         this.addressProvided = true;
         this.address = address;
-    }
-
-    public boolean isAddressProvided() {
-        return addressProvided;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.javasbtemp1.user;
+package com.example.javasbtemp1.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
