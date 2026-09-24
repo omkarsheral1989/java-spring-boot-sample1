@@ -1,7 +1,7 @@
 package com.example.javasbtemp1.user.service;
 
-import com.example.javasbtemp1.user.dto.CreateUserRequest;
-import com.example.javasbtemp1.user.dto.UserPatchRequest;
+import com.example.javasbtemp1.user.dto.CreateUserDto;
+import com.example.javasbtemp1.user.dto.PatchUserDto;
 import com.example.javasbtemp1.user.entity.User;
 import com.example.javasbtemp1.user.exception.DuplicateEmailException;
 import com.example.javasbtemp1.user.exception.UserNotFoundException;
@@ -31,34 +31,34 @@ public class UserService {
 	}
 
 	@NonNull
-	public User create(CreateUserRequest request) throws DuplicateEmailException {
-		String email = normalizeEmail(request.getEmail());
+	public User create(CreateUserDto payload) throws DuplicateEmailException {
+		String email = normalizeEmail(payload.getEmail());
 		ensureEmailAvailable(email);
 
 		User user = new User();
-		user.setName(request.getName().trim());
+		user.setName(payload.getName().trim());
 		user.setEmail(email);
-		user.setAddress(trimToNull(request.getAddress()));
+		user.setAddress(trimToNull(payload.getAddress()));
 		return userRepository.save(user);
 	}
 
 	@NonNull
-	public User patch(Long id, UserPatchRequest request)
+	public User patch(Long id, PatchUserDto payload)
 			throws UserNotFoundException, DuplicateEmailException {
 		User user = findById(id);
 
-		if (request.getName() != null) {
-			user.setName(requireNonBlank(request.getName(), "name"));
+		if (payload.getName() != null) {
+			user.setName(requireNonBlank(payload.getName(), "name"));
 		}
-		if (request.getEmail() != null) {
-			String email = normalizeEmail(requireNonBlank(request.getEmail(), "email"));
+		if (payload.getEmail() != null) {
+			String email = normalizeEmail(requireNonBlank(payload.getEmail(), "email"));
 			if (!email.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmailIgnoreCase(email)) {
 				throw new DuplicateEmailException(email);
 			}
 			user.setEmail(email);
 		}
-		if (request.isAddressProvided()) {
-			user.setAddress(trimToNull(request.getAddress()));
+		if (payload.isAddressProvided()) {
+			user.setAddress(trimToNull(payload.getAddress()));
 		}
 
 		return userRepository.save(user);

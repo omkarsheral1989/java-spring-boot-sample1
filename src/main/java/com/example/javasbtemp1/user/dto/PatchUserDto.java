@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = false)
-public class UserPatchRequest {
+public class PatchUserDto {
 
     private String name;
 

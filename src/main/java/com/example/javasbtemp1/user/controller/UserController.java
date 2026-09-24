@@ -3,8 +3,8 @@ package com.example.javasbtemp1.user.controller;
 import java.net.URI;
 import java.util.List;
 
-import com.example.javasbtemp1.user.dto.CreateUserRequest;
-import com.example.javasbtemp1.user.dto.UserPatchRequest;
+import com.example.javasbtemp1.user.dto.CreateUserDto;
+import com.example.javasbtemp1.user.dto.PatchUserDto;
 import com.example.javasbtemp1.user.entity.User;
 import com.example.javasbtemp1.user.service.UserService;
 import jakarta.validation.Valid;
@@ -39,8 +39,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserRequest request) {
-        User user = userService.create(request);
+    public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserDto payload) {
+        User user = userService.create(payload);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(user.getId())
@@ -49,8 +49,8 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public User patchUser(@PathVariable Long id, @Valid @RequestBody UserPatchRequest request) {
-        return userService.patch(id, request);
+    public User patchUser(@PathVariable Long id, @Valid @RequestBody PatchUserDto payload) {
+        return userService.patch(id, payload);
     }
 
     @DeleteMapping("/{id}")
