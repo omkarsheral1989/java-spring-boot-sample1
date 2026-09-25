@@ -45,23 +45,28 @@ public class UserService {
 	@NonNull
 	public User patch(Long id, PatchUserDto payload)
 			throws UserNotFoundException, DuplicateEmailException {
-		User user = findById(id);
+		User existingUser = findById(id);
+		User updatedUser = new User(
+				existingUser.getId(),
+				existingUser.getName(),
+				existingUser.getEmail(),
+				existingUser.getAddress());
 
 		if (payload.getName() != null) {
-			user.setName(requireNonBlank(payload.getName(), "name"));
+			updatedUser.setName(requireNonBlank(payload.getName(), "name"));
 		}
 		if (payload.getEmail() != null) {
 			String email = normalizeEmail(requireNonBlank(payload.getEmail(), "email"));
-			if (!email.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmailIgnoreCase(email)) {
+			if (!email.equalsIgnoreCase(existingUser.getEmail()) && userRepository.existsByEmailIgnoreCase(email)) {
 				throw new DuplicateEmailException(email);
 			}
-			user.setEmail(email);
+			updatedUser.setEmail(email);
 		}
 		if (payload.isAddressProvided()) {
-			user.setAddress(trimToNull(payload.getAddress()));
+			updatedUser.setAddress(trimToNull(payload.getAddress()));
 		}
 
-		return userRepository.save(user);
+		return userRepository.save(updatedUser);
 	}
 
 	public void delete(Long id) throws UserNotFoundException {
