@@ -1,6 +1,7 @@
 package com.example.javasbtemp1.user.service;
 
 import com.example.javasbtemp1.user.entity.User;
+import com.example.javasbtemp1.user.entity.Address;
 import com.example.javasbtemp1.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,8 +34,8 @@ class FindAllUsersServiceTest {
         @DisplayName("when users exist")
         void whenUsersExist() {
             List<User> expectedUsers = List.of(
-                    new User(1L, "Alice", "alice@example.com", "123 Main Street"),
-                    new User(2L, "Bob", "bob@example.com", "456 Oak Avenue"));
+                    new User(1L, "Alice", "alice@example.com", new Address(1L, "Toronto", "Canada")),
+                    new User(2L, "Bob", "bob@example.com", new Address(2L, "Vancouver", "Canada")));
             when(userRepository.findAll()).thenReturn(expectedUsers);
 
             List<User> actualUsers = userService.findAll();

@@ -1,6 +1,7 @@
 package com.example.javasbtemp1.user.service;
 
 import com.example.javasbtemp1.user.entity.User;
+import com.example.javasbtemp1.user.entity.Address;
 import com.example.javasbtemp1.user.exception.UserNotFoundException;
 import com.example.javasbtemp1.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +34,7 @@ class FindUserByIdServiceTest {
         @Test
         @DisplayName("when user exists")
         void whenUserExists() {
-            User expectedUser = new User(1L, "Alice", "alice@example.com", "123 Main Street");
+            User expectedUser = new User(1L, "Alice", "alice@example.com", new Address(1L, "Toronto", "Canada"));
             when(userRepository.findById(1L)).thenReturn(Optional.of(expectedUser));
 
             User actualUser = userService.findById(1L);

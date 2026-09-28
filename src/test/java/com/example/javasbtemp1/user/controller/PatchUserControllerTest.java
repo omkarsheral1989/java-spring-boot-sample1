@@ -1,6 +1,8 @@
 package com.example.javasbtemp1.user.controller;
 
 import com.example.javasbtemp1.user.dto.PatchUserDto;
+import com.example.javasbtemp1.user.dto.AddressDto;
+import com.example.javasbtemp1.user.entity.Address;
 import com.example.javasbtemp1.user.entity.User;
 import com.example.javasbtemp1.user.exception.DuplicateEmailException;
 import com.example.javasbtemp1.user.exception.UserNotFoundException;
@@ -39,16 +41,16 @@ class PatchUserControllerTest {
 		@Test
 		@DisplayName("when payload is valid")
 		void whenPayloadIsValid() throws Exception {
-			PatchUserDto expectedPayload = new PatchUserDto();
-			expectedPayload.setName("Alice Updated");
-			expectedPayload.setEmail("alice.updated@example.com");
-			expectedPayload.setAddress("789 Pine Road");
+			PatchUserDto expectedPayload = new PatchUserDto(
+					"Alice Updated",
+					"alice.updated@example.com",
+					new AddressDto("Pine", "Canada"));
 
 			User updatedUser = new User(
 					1L,
 					"Alice Updated",
 					"alice.updated@example.com",
-					"789 Pine Road");
+					new Address(2L, "Pine", "Canada"));
 			when(userService.patch(eq(1L), eq(expectedPayload))).thenReturn(updatedUser);
 
 			mockMvc.perform(patch("/users/1")
@@ -57,7 +59,10 @@ class PatchUserControllerTest {
 									{
 									  "name": "Alice Updated",
 									  "email": "alice.updated@example.com",
-									  "address": "789 Pine Road"
+									  "address": {
+									    "city": "Pine",
+									    "country": "Canada"
+									  }
 									}
 									"""))
 					.andExpect(status().isOk())
@@ -66,7 +71,11 @@ class PatchUserControllerTest {
 							  "id": 1,
 							  "name": "Alice Updated",
 							  "email": "alice.updated@example.com",
-							  "address": "789 Pine Road"
+							  "address": {
+							    "id": 2,
+							    "city": "Pine",
+							    "country": "Canada"
+							  }
 							}
 							"""));
 
@@ -79,7 +88,7 @@ class PatchUserControllerTest {
 			PatchUserDto expectedPayload = new PatchUserDto();
 			expectedPayload.setName("Alice Updated");
 
-			User updatedUser = new User(1L, "Alice Updated", "alice@example.com", "123 Main Street");
+			User updatedUser = new User(1L, "Alice Updated", "alice@example.com", new Address(1L, "Toronto", "Canada"));
 			when(userService.patch(eq(1L), eq(expectedPayload))).thenReturn(updatedUser);
 
 			mockMvc.perform(patch("/users/1")
@@ -95,7 +104,11 @@ class PatchUserControllerTest {
 							  "id": 1,
 							  "name": "Alice Updated",
 							  "email": "alice@example.com",
-							  "address": "123 Main Street"
+							  "address": {
+							    "id": 1,
+							    "city": "Toronto",
+							    "country": "Canada"
+							  }
 							}
 							"""));
 
@@ -186,6 +199,58 @@ class PatchUserControllerTest {
 							"""));
 
 			verify(userService).patch(1L, expectedPayload);
+		}
+
+		@Test
+		@DisplayName("when address.city is missing")
+		void whenAddressCityIsMissing() throws Exception {
+			mockMvc.perform(patch("/users/1")
+							.contentType("application/json")
+							.content("""
+									{
+									  "address": {
+									    "country": "Canada"
+									  }
+									}
+									"""))
+					.andExpect(status().isBadRequest())
+					.andExpect(content().json("""
+							{
+							  "status": 400,
+							  "message": "Request validation failed",
+							  "fieldErrors": {
+							    "address.city": "must not be blank"
+							  }
+							}
+							"""));
+
+			verifyNoInteractions(userService);
+		}
+
+		@Test
+		@DisplayName("when address.country is missing")
+		void whenAddressCountryIsMissing() throws Exception {
+			mockMvc.perform(patch("/users/1")
+							.contentType("application/json")
+							.content("""
+									{
+									  "address": {
+									    "city": "Toronto"
+									  }
+									}
+									"""))
+					.andExpect(status().isBadRequest())
+					.andExpect(content().json("""
+							{
+							  "status": 400,
+							  "message": "Request validation failed",
+							  "fieldErrors": {
+							    "address.country": "must not be blank"
+							  }
+							}
+							"""));
+
+			verifyNoInteractions(userService);
 		}
 
 		@Test

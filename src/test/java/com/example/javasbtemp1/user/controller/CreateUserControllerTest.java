@@ -1,6 +1,8 @@
 package com.example.javasbtemp1.user.controller;
 
 import com.example.javasbtemp1.user.dto.CreateUserDto;
+import com.example.javasbtemp1.user.dto.AddressDto;
+import com.example.javasbtemp1.user.entity.Address;
 import com.example.javasbtemp1.user.entity.User;
 import com.example.javasbtemp1.user.exception.DuplicateEmailException;
 import com.example.javasbtemp1.user.service.UserService;
@@ -39,8 +41,8 @@ class CreateUserControllerTest {
 		@DisplayName("when payload is valid")
 		void whenPayloadIsValid() throws Exception {
 			CreateUserDto expectedPayload =
-					new CreateUserDto("Alice", "alice@example.com", "123 Main Street");
-			User createdUser = new User(1L, "Alice", "alice@example.com", "123 Main Street");
+					new CreateUserDto("Alice", "alice@example.com", new AddressDto("Toronto", "Canada"));
+			User createdUser = new User(1L, "Alice", "alice@example.com", new Address(1L, "Toronto", "Canada"));
 			when(userService.create(eq(expectedPayload))).thenReturn(createdUser);
 
 			mockMvc.perform(post("/users")
@@ -49,7 +51,10 @@ class CreateUserControllerTest {
 									{
 									  "name": "Alice",
 									  "email": "alice@example.com",
-									  "address": "123 Main Street"
+									  "address": {
+									    "city": "Toronto",
+									    "country": "Canada"
+									  }
 									}
 									"""))
 					.andExpect(status().isCreated())
@@ -57,7 +62,11 @@ class CreateUserControllerTest {
 					.andExpect(content().json("""
 							{
 							  "id": 1,
-							  "address": "123 Main Street",
+							  "address": {
+							    "id": 1,
+							    "city": "Toronto",
+							    "country": "Canada"
+							  },
 							  "email": "alice@example.com",
 							  "name": "Alice"
 							}
@@ -100,6 +109,120 @@ class CreateUserControllerTest {
 	@DisplayName("should fail")
 	class ShouldFail {
 		@Test
+		@DisplayName("when address.city is missing")
+		void whenAddressCityIsMissing() throws Exception {
+			mockMvc.perform(post("/users")
+							.contentType("application/json")
+							.content("""
+									{
+									  "name": "Alice",
+									  "email": "alice@example.com",
+									  "address": {
+									    "country": "Canada"
+									  }
+									}
+									"""))
+					.andExpect(status().isBadRequest())
+					.andExpect(content().json("""
+							{
+							  "status": 400,
+							  "message": "Request validation failed",
+							  "fieldErrors": {
+							    "address.city": "must not be blank"
+							  }
+							}
+							"""));
+
+			verifyNoInteractions(userService);
+		}
+
+		@Test
+		@DisplayName("when address.country is missing")
+		void whenAddressCountryIsMissing() throws Exception {
+			mockMvc.perform(post("/users")
+							.contentType("application/json")
+							.content("""
+									{
+									  "name": "Alice",
+									  "email": "alice@example.com",
+									  "address": {
+									    "city": "Toronto"
+									  }
+									}
+									"""))
+					.andExpect(status().isBadRequest())
+					.andExpect(content().json("""
+							{
+							  "status": 400,
+							  "message": "Request validation failed",
+							  "fieldErrors": {
+							    "address.country": "must not be blank"
+							  }
+							}
+							"""));
+
+			verifyNoInteractions(userService);
+		}
+
+		@Test
+		@DisplayName("when address.city is blank")
+		void whenAddressCityIsBlank() throws Exception {
+			mockMvc.perform(post("/users")
+							.contentType("application/json")
+							.content("""
+									{
+									  "name": "Alice",
+									  "email": "alice@example.com",
+									  "address": {
+									    "city": " ",
+									    "country": "Canada"
+									  }
+									}
+									"""))
+					.andExpect(status().isBadRequest())
+					.andExpect(content().json("""
+							{
+							  "status": 400,
+							  "message": "Request validation failed",
+							  "fieldErrors": {
+							    "address.city": "must not be blank"
+							  }
+							}
+							"""));
+
+			verifyNoInteractions(userService);
+		}
+
+		@Test
+		@DisplayName("when address.country is blank")
+		void whenAddressCountryIsBlank() throws Exception {
+			mockMvc.perform(post("/users")
+							.contentType("application/json")
+							.content("""
+									{
+									  "name": "Alice",
+									  "email": "alice@example.com",
+									  "address": {
+									    "city": "Toronto",
+									    "country": " "
+									  }
+									}
+									"""))
+					.andExpect(status().isBadRequest())
+					.andExpect(content().json("""
+							{
+							  "status": 400,
+							  "message": "Request validation failed",
+							  "fieldErrors": {
+							    "address.country": "must not be blank"
+							  }
+							}
+							"""));
+
+			verifyNoInteractions(userService);
+		}
+
+		@Test
 		@DisplayName("when email is invalid")
 		void whenEmailIsInvalid() throws Exception {
 			mockMvc.perform(post("/users")
@@ -108,7 +231,10 @@ class CreateUserControllerTest {
 									{
 									  "name": "Alice",
 									  "email": "not-an-email",
-									  "address": "123 Main Street"
+									  "address": {
+									    "city": "Toronto",
+									    "country": "Canada"
+									  }
 									}
 									"""))
 					.andExpect(status().isBadRequest())
@@ -133,7 +259,10 @@ class CreateUserControllerTest {
 							.content("""
 									{
 									  "name": "Alice",
-									  "address": "123 Main Street"
+									  "address": {
+									    "city": "Toronto",
+									    "country": "Canada"
+									  }
 									}
 									"""))
 					.andExpect(status().isBadRequest())

@@ -1,6 +1,8 @@
 package com.example.javasbtemp1.user.service;
 
 import com.example.javasbtemp1.user.dto.CreateUserDto;
+import com.example.javasbtemp1.user.dto.AddressDto;
+import com.example.javasbtemp1.user.entity.Address;
 import com.example.javasbtemp1.user.entity.User;
 import com.example.javasbtemp1.user.exception.DuplicateEmailException;
 import com.example.javasbtemp1.user.repository.UserRepository;
@@ -37,9 +39,9 @@ class CreateUserServiceTest {
 			CreateUserDto payload = new CreateUserDto(
 					"  Alice  ",
 					" Alice@Example.com ",
-					" 123 Main Street ");
-			User userToSave = new User(null, "Alice", "alice@example.com", "123 Main Street");
-			User expectedSavedUser = new User(1L, "Alice", "alice@example.com", "123 Main Street");
+					new AddressDto(" Toronto ", " Canada "));
+			User userToSave = new User(null, "Alice", "alice@example.com", new Address(null, "Toronto", "Canada"));
+			User expectedSavedUser = new User(1L, "Alice", "alice@example.com", new Address(1L, "Toronto", "Canada"));
 			when(userRepository.existsByEmailIgnoreCase("alice@example.com")).thenReturn(false);
 			when(userRepository.save(eq(userToSave))).thenReturn(expectedSavedUser);
 
@@ -51,15 +53,17 @@ class CreateUserServiceTest {
 		}
 
 		@Test
-		@DisplayName("with a null address when address is blank")
-		void withNullAddressWhenAddressIsBlank() {
-			CreateUserDto payload = new CreateUserDto("Alice", "alice@example.com", "   ");
+		@DisplayName("with no address when address is omitted")
+		void withNoAddressWhenAddressIsOmitted() {
+			CreateUserDto payload = new CreateUserDto("Alice", "alice@example.com", null);
 			User userToSave = new User(null, "Alice", "alice@example.com", null);
+			User expectedSavedUser = new User(1L, "Alice", "alice@example.com", null);
 			when(userRepository.existsByEmailIgnoreCase("alice@example.com")).thenReturn(false);
-			when(userRepository.save(eq(userToSave))).thenReturn(userToSave);
+			when(userRepository.save(eq(userToSave))).thenReturn(expectedSavedUser);
 
 			User actualSavedUser = userService.create(payload);
 
+			assertEquals(expectedSavedUser, actualSavedUser);
 			assertNull(actualSavedUser.getAddress());
 			verify(userRepository).save(eq(userToSave));
 		}
@@ -75,7 +79,7 @@ class CreateUserServiceTest {
 			CreateUserDto payload = new CreateUserDto(
 					"Alice",
 					" Alice@Example.com ",
-					"123 Main Street");
+					new AddressDto("Toronto", "Canada"));
 			when(userRepository.existsByEmailIgnoreCase("alice@example.com")).thenReturn(true);
 
 			DuplicateEmailException actualException = assertThrows(

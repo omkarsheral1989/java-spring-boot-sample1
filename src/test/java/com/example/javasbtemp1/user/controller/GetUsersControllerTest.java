@@ -1,6 +1,7 @@
 package com.example.javasbtemp1.user.controller;
 
 import com.example.javasbtemp1.user.entity.User;
+import com.example.javasbtemp1.user.entity.Address;
 import com.example.javasbtemp1.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,8 +38,8 @@ class GetUsersControllerTest {
 		@DisplayName("when users exist")
 		void whenUsersExist() throws Exception {
 			when(userService.findAll()).thenReturn(List.of(
-					new User(1L, "Alice", "alice@example.com", "123 Main Street"),
-					new User(2L, "Bob", "bob@example.com", "456 Oak Avenue")
+					new User(1L, "Alice", "alice@example.com", new Address(1L, "Toronto", "Canada")),
+					new User(2L, "Bob", "bob@example.com", new Address(2L, "Vancouver", "Canada"))
 			));
 
 			mockMvc.perform(get("/users"))
@@ -49,13 +50,21 @@ class GetUsersControllerTest {
 							    "id": 1,
 							    "name": "Alice",
 							    "email": "alice@example.com",
-							    "address": "123 Main Street"
+							    "address": {
+							      "id": 1,
+							      "city": "Toronto",
+							      "country": "Canada"
+							    }
 							  },
 							  {
 							    "id": 2,
 							    "name": "Bob",
 							    "email": "bob@example.com",
-							    "address": "456 Oak Avenue"
+							    "address": {
+							      "id": 2,
+							      "city": "Vancouver",
+							      "country": "Canada"
+							    }
 							  }
 							]
 							""", JsonCompareMode.STRICT));
@@ -67,8 +76,8 @@ class GetUsersControllerTest {
 		@DisplayName("when users are returned in a specific order")
 		void whenUsersAreReturnedInSpecificOrder() throws Exception {
 			when(userService.findAll()).thenReturn(List.of(
-					new User(2L, "Bob", "bob@example.com", "456 Oak Avenue"),
-					new User(1L, "Alice", "alice@example.com", "123 Main Street")
+					new User(2L, "Bob", "bob@example.com", new Address(2L, "Vancouver", "Canada")),
+					new User(1L, "Alice", "alice@example.com", new Address(1L, "Toronto", "Canada"))
 			));
 
 			mockMvc.perform(get("/users"))
@@ -79,13 +88,21 @@ class GetUsersControllerTest {
 							    "id": 2,
 							    "name": "Bob",
 							    "email": "bob@example.com",
-							    "address": "456 Oak Avenue"
+							    "address": {
+							      "id": 2,
+							      "city": "Vancouver",
+							      "country": "Canada"
+							    }
 							  },
 							  {
 							    "id": 1,
 							    "name": "Alice",
 							    "email": "alice@example.com",
-							    "address": "123 Main Street"
+							    "address": {
+							      "id": 1,
+							      "city": "Toronto",
+							      "country": "Canada"
+							    }
 							  }
 							]
 							""", JsonCompareMode.STRICT));
