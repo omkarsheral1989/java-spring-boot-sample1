@@ -1,6 +1,7 @@
 package com.example.javasbtemp1.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
 
@@ -13,10 +14,11 @@ public class PatchUserDto {
     @Email
     private String email;
 
-    private String address;
+    @Valid
+    private AddressDto address;
     private boolean addressProvided;
 
-    public void setAddress(String address) {
+    public void setAddress(AddressDto address) {
         this.addressProvided = true;
         this.address = address;
     }

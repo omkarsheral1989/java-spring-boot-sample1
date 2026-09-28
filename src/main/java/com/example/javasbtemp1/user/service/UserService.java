@@ -1,7 +1,9 @@
 package com.example.javasbtemp1.user.service;
 
+import com.example.javasbtemp1.user.dto.AddressDto;
 import com.example.javasbtemp1.user.dto.CreateUserDto;
 import com.example.javasbtemp1.user.dto.PatchUserDto;
+import com.example.javasbtemp1.user.entity.Address;
 import com.example.javasbtemp1.user.entity.User;
 import com.example.javasbtemp1.user.exception.DuplicateEmailException;
 import com.example.javasbtemp1.user.exception.UserNotFoundException;
@@ -38,7 +40,7 @@ public class UserService {
 		User user = new User();
 		user.setName(payload.getName().trim());
 		user.setEmail(email);
-		user.setAddress(trimToNull(payload.getAddress()));
+		user.setAddress(toAddress(payload.getAddress()));
 		return userRepository.save(user);
 	}
 
@@ -50,7 +52,7 @@ public class UserService {
 				existingUser.getId(),
 				existingUser.getName(),
 				existingUser.getEmail(),
-				existingUser.getAddress());
+				copyAddress(existingUser.getAddress()));
 
 		if (payload.getName() != null) {
 			updatedUser.setName(requireNonBlank(payload.getName(), "name"));
@@ -63,7 +65,7 @@ public class UserService {
 			updatedUser.setEmail(email);
 		}
 		if (payload.isAddressProvided()) {
-			updatedUser.setAddress(trimToNull(payload.getAddress()));
+			updatedUser.setAddress(toAddress(payload.getAddress()));
 		}
 
 		return userRepository.save(updatedUser);
@@ -91,7 +93,20 @@ public class UserService {
 		return value.trim();
 	}
 
-	private String trimToNull(String value) {
-		return StringUtils.hasText(value) ? value.trim() : null;
+	private Address toAddress(AddressDto address) {
+		if (address == null) {
+			return null;
+		}
+		return new Address(
+				null,
+				requireNonBlank(address.getCity(), "address.city"),
+				requireNonBlank(address.getCountry(), "address.country"));
+	}
+
+	private Address copyAddress(Address address) {
+		if (address == null) {
+			return null;
+		}
+		return new Address(address.getId(), address.getCity(), address.getCountry());
 	}
 }
